@@ -200,8 +200,7 @@ sudo npm install -g remixd --unsafe-perm=true --allow-root
 
 ```
 cp ~projects/ico/contracts ~projects/remix.tm_contracts
-rm ~/projects/remix.tmico.contracts/zeppelin
-cp -r ~projects/zeppelin-solidity ~/projects/remix.tm_contracts/zeppelin
+cp -r ~projects/ico/zeppelin ~/projects/remix.tm_contracts/zeppelin
 
 ```
 
