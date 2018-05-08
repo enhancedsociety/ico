@@ -43,7 +43,7 @@ git clone https://github.com/enhancedsociety/ico.git
 
 ```
 
-4.  Extract Geth
+3.  Extract Geth
 
 ```
 cd ~/Projects
@@ -51,14 +51,15 @@ tar -zxvf geth-linux-amd64-1.8.3-329ac18e.tar.gz
 cd geth-linux-amd64-1.8.3-329ac18e.tar.gz
 
 ```
-5. Now start geth with the below command. Note : rpc related parameters are included so geth allows connections from Remix and TokenMarket.
+
+4. Now start geth with the below command. Note : rpc related parameters are included so geth allows connections from Remix and TokenMarket.
 
 ``` 
 ./geth --dev --datadir=/home/toor/.ethereum/private  --rpcapi "personal,web3,eth,net,db,debug" --rpc --rpcaddr "0.0.0.0" --rpccorsdomain "*" console'
 
 ```
 
-6. Install and Configure Ethereum Wallet to connect to your local Instance.
+5. Install and Configure Ethereum Wallet to connect to your local Instance.
 
 ``` 
 cd ~/Projects
