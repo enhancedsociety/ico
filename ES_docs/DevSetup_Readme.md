@@ -34,12 +34,13 @@ docker --version
 Docker version 18.03.0-ce, build 0520e24
 
 ```
+
 2. Obtain Token Market & (Zeppelin) Repo
 
 ```
 mkdir ~/Projects
 cd ~/Projects
-git clone https://github.com/enhancedsociety/ico.git
+git clone --recursive https://github.com/TokenMarketNet/ico.git
 
 ```
 
@@ -199,8 +200,8 @@ sudo npm install -g remixd --unsafe-perm=true --allow-root
 
 
 ```
-cp ~projects/ico/contracts ~projects/remix.tm_contracts
-cp -r ~projects/ico/zeppelin ~/projects/remix.tm_contracts/zeppelin
+cp ~/Projects/ico/contracts ~projects/remix.tm_contracts
+cp -r ~/Projects/ico/zeppelin ~/projects/remix.tm_contracts/zeppelin
 
 ```
 
