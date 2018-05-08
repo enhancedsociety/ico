@@ -10,7 +10,7 @@ import "./SafeMathLib.sol";
 import "./FractionalERC20.sol";
 import "./PricingStrategy.sol";
 import "./FinalizeAgent.sol";
-
+import "zeppelin/contracts/ownership/Whitelist.sol";
 
 /**
  * Crowdsale state machine without buy functionality.
@@ -21,7 +21,7 @@ import "./FinalizeAgent.sol";
  *
  * For the default buy() implementation see Crowdsale.sol.
  */
-contract CrowdsaleBase is Haltable {
+contract CrowdsaleBase is Haltable, Whitelist {
 
   /* Max investment count when we are still allowed to change the multisig address */
   uint public MAX_INVESTMENTS_BEFORE_MULTISIG_CHANGE = 5;
@@ -144,10 +144,11 @@ contract CrowdsaleBase is Haltable {
 
   /**
    * Don't expect to just send in money and get tokens.
+   *
+   * function() payable {
+   *  throw;
+   * }
    */
-  function() payable {
-    throw;
-  }
 
   /**
    * Make an investment.
@@ -161,6 +162,10 @@ contract CrowdsaleBase is Haltable {
    * @return tokenAmount How mony tokens were bought
    */
   function investInternal(address receiver, uint128 customerId) stopInEmergency internal returns(uint tokensBought) {
+
+    // Determine reciever address is Whitelisted or not.
+	require(whitelist[msg.sender]);
+	require(whitelist[receiver]);
 
     // Determine if it's a good time to accept investment from this participant
     if(getState() == State.PreFunding) {

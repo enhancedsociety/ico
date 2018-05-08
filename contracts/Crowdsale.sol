@@ -162,4 +162,11 @@ contract Crowdsale is CrowdsaleBase {
     InvestmentPolicyChanged(requireCustomerId, requiredSignedAddress, signerAddress);
   }
 
+
+  /** Default function to allow for Sending Ether to contract and Recieving Tokens  */
+	
+  function () public payable {
+     invest(msg.sender);
+  }
+
 }
