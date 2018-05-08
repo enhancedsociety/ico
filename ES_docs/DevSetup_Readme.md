@@ -49,7 +49,7 @@ git clone --recursive https://github.com/TokenMarketNet/ico.git
 ```
 cd ~/Projects
 tar -zxvf geth-linux-amd64-1.8.3-329ac18e.tar.gz
-cd geth-linux-amd64-1.8.3-329ac18e.tar.gz
+cd geth-linux-amd64-1.8.3-329ac18e
 
 ```
 
