@@ -46,10 +46,10 @@ contract EthTranchePricing is PricingStrategy, Ownable {
 
   /// @dev Contruction, creating a list of tranches
   /// @param _tranches uint[] tranches Pairs of (start amount, price)
-  function EthTranchePricing(uint[] _tranches) {
+  function EthTranchePricing(uint[] _tranches)  public {
     // Need to have tuples, length check
     if(_tranches.length % 2 == 1 || _tranches.length >= MAX_TRANCHES*2) {
-      throw;
+      revert();
     }
 
     trancheCount = _tranches.length / 2;
@@ -62,7 +62,7 @@ contract EthTranchePricing is PricingStrategy, Ownable {
 
       // No invalid steps
       if((highestAmount != 0) && (tranches[i].amount <= highestAmount)) {
-        throw;
+        revert();
       }
 
       highestAmount = tranches[i].amount;
@@ -70,12 +70,12 @@ contract EthTranchePricing is PricingStrategy, Ownable {
 
     // We need to start from zero, otherwise we blow up our deployment
     if(tranches[0].amount != 0) {
-      throw;
+      revert();
     }
 
     // Last tranche price must be zero, terminating the crowdale
     if(tranches[trancheCount-1].price != 0) {
-      throw;
+      revert();
     }
   }
 
@@ -161,8 +161,8 @@ contract EthTranchePricing is PricingStrategy, Ownable {
     return value.times(multiplier) / price;
   }
 
-  function() payable {
-    throw; // No money on this contract
+  function() payable  public {
+    revert(); // No money on this contract
   }
 
 }

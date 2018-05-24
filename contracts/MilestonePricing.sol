@@ -44,10 +44,10 @@ contract MilestonePricing is PricingStrategy, Ownable {
 
   /// @dev Contruction, creating a list of milestones
   /// @param _milestones uint[] milestones Pairs of (time, price)
-  function MilestonePricing(uint[] _milestones) {
+  function MilestonePricing(uint[] _milestones)  public {
     // Need to have tuples, length check
     if(_milestones.length % 2 == 1 || _milestones.length >= MAX_MILESTONE*2) {
-      throw;
+      revert();
     }
 
     milestoneCount = _milestones.length / 2;
@@ -60,7 +60,7 @@ contract MilestonePricing is PricingStrategy, Ownable {
 
       // No invalid steps
       if((lastTimestamp != 0) && (milestones[i].time <= lastTimestamp)) {
-        throw;
+        revert();
       }
 
       lastTimestamp = milestones[i].time;
@@ -68,7 +68,7 @@ contract MilestonePricing is PricingStrategy, Ownable {
 
     // Last milestone price must be zero, terminating the crowdale
     if(milestones[milestoneCount-1].price != 0) {
-      throw;
+      revert();
     }
   }
 
@@ -149,8 +149,8 @@ contract MilestonePricing is PricingStrategy, Ownable {
       return false;
   }
 
-  function() payable {
-    throw; // No money on this contract
+  function() payable  public {
+    revert(); // No money on this contract
   }
 
 }

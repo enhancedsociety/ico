@@ -1,11 +1,11 @@
 pragma solidity ^0.4.8;
 
 contract ERC827Receiver {
-  function ERC827Receiver() {
+  function ERC827Receiver()  public {
     
   }
 
-  function receive() returns(bool){
+  function receive() public returns(bool){
     return true;
   }
 }

@@ -36,7 +36,7 @@ contract PaymentForwarder is Haltable {
   /** A customer has made a payment. Benefactor is the address where the tokens will be ultimately issued.*/
   event PaymentForwarded(address source, uint amount, uint128 customerId, address benefactor);
 
-  function PaymentForwarder(address _owner, address _teamMultisig) {
+  function PaymentForwarder(address _owner, address _teamMultisig)  public {
     teamMultisig = _teamMultisig;
     owner = _owner;
   }
@@ -62,7 +62,7 @@ contract PaymentForwarder is Haltable {
     paymentsByBenefactor[benefactor] += weiAmount;
 
     // May run out of gas
-    if(!teamMultisig.send(weiAmount)) throw;
+    if(!teamMultisig.send(weiAmount)) revert();
   }
 
   /**
@@ -73,7 +73,7 @@ contract PaymentForwarder is Haltable {
    */
    function pay(uint128 customerId, address benefactor, bytes1 checksum) public stopInEmergency payable {
     // see customerid.py
-     if (bytes1(sha3(customerId, benefactor)) != checksum) throw;
+     if (bytes1(keccak256(customerId, benefactor)) != checksum) revert();
      payWithoutChecksum(customerId, benefactor);
    }
 
@@ -85,7 +85,7 @@ contract PaymentForwarder is Haltable {
    */
   function payForMyselfWithChecksum(uint128 customerId, bytes1 checksum) public payable {
     // see customerid.py
-    if (bytes1(sha3(customerId)) != checksum) throw;
+    if (bytes1(keccak256(customerId)) != checksum) revert();
     payWithoutChecksum(customerId, msg.sender);
   }
 

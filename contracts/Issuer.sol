@@ -36,14 +36,14 @@ contract Issuer is Ownable {
   /** How many addresses have received their tokens. */
   uint public issuedCount;
 
-  function Issuer(address _owner, address _allower, StandardTokenExt _token) {
+  function Issuer(address _owner, address _allower, StandardTokenExt _token)  public {
     owner = _owner;
     allower = _allower;
     token = _token;
   }
 
-  function issue(address benefactor, uint amount) onlyOwner {
-    if(issued[benefactor]) throw;
+  function issue(address benefactor, uint amount) onlyOwner  public {
+    if(issued[benefactor]) revert();
     token.transferFrom(allower, benefactor, amount);
     issued[benefactor] = true;
     issuedCount += amount;

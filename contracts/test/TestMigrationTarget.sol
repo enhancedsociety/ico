@@ -17,24 +17,24 @@ contract TestMigrationTarget is StandardTokenExt, UpgradeAgent {
 
   uint public originalSupply;
 
-  function TestMigrationTarget(UpgradeableToken _oldToken) {
+  function TestMigrationTarget(UpgradeableToken _oldToken)  public {
 
     oldToken = _oldToken;
 
     // Let's not set bad old token
     if(address(oldToken) == 0) {
-      throw;
+      revert();
     }
 
     // Let's make sure we have something to migrate
     originalSupply = _oldToken.totalSupply();
     if(originalSupply == 0) {
-      throw;
+      revert();
     }
   }
 
   function upgradeFrom(address _from, uint256 _value) public {
-    if (msg.sender != address(oldToken)) throw; // only upgrade from oldToken
+    if (msg.sender != address(oldToken)) revert(); // only upgrade from oldToken
 
     // Mint new tokens to the migrator
     totalSupply_ = totalSupply_.plus(_value);
@@ -43,7 +43,7 @@ contract TestMigrationTarget is StandardTokenExt, UpgradeAgent {
   }
 
   function() public payable {
-    throw;
+    revert();
   }
 
 }

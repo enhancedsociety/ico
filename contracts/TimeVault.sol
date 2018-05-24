@@ -33,15 +33,15 @@ contract TimeVault {
 
   event Unlocked();
 
-  function TimeVault(address _teamMultisig, StandardTokenExt _token, uint _unlockedAt) {
+  function TimeVault(address _teamMultisig, StandardTokenExt _token, uint _unlockedAt)  public {
 
     teamMultisig = _teamMultisig;
     token = _token;
     unlockedAt = _unlockedAt;
 
     // Sanity check
-    if (teamMultisig == 0x0) throw;
-    if (address(token) == 0x0) throw;
+    if (teamMultisig == 0x0) revert();
+    if (address(token) == 0x0) revert();
   }
 
   function getTokenBalance() public constant returns (uint) {
@@ -50,7 +50,7 @@ contract TimeVault {
 
   function unlock() public {
     // Wait your turn!
-    if (now < unlockedAt) throw;
+    if (now < unlockedAt) revert();
 
     // StandardToken will throw in the case of transaction fails
     token.transfer(teamMultisig, getTokenBalance());
@@ -59,6 +59,6 @@ contract TimeVault {
   }
 
   // disallow ETH payment for this vault
-  function () { throw; }
+  function ()  public { revert(); }
 
 }

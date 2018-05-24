@@ -19,7 +19,7 @@ contract DefaultFinalizeAgent is FinalizeAgent {
   ReleasableToken public token;
   Crowdsale public crowdsale;
 
-  function DefaultFinalizeAgent(ReleasableToken _token, Crowdsale _crowdsale) {
+  function DefaultFinalizeAgent(ReleasableToken _token, Crowdsale _crowdsale)  public {
     token = _token;
     crowdsale = _crowdsale;
   }
@@ -32,7 +32,7 @@ contract DefaultFinalizeAgent is FinalizeAgent {
   /** Called once by crowdsale finalize() if the sale was success. */
   function finalizeCrowdsale() public {
     if(msg.sender != address(crowdsale)) {
-      throw;
+      revert();
     }
     token.releaseTokenTransfer();
   }

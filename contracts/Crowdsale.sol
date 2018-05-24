@@ -44,7 +44,7 @@ contract Crowdsale is CrowdsaleBase {
   /* Server side address that signed allowed contributors (Ethereum addresses) that can participate the crowdsale */
   address public signerAddress;
 
-  function Crowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal) CrowdsaleBase(_token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal) {
+  function Crowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal) CrowdsaleBase(_token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal)  public {
   }
 
   /**
@@ -84,8 +84,8 @@ contract Crowdsale is CrowdsaleBase {
    */
   function investWithSignedAddress(address addr, uint128 customerId, uint8 v, bytes32 r, bytes32 s) public payable {
      bytes32 hash = sha256(addr);
-     if (ecrecover(hash, v, r, s) != signerAddress) throw;
-     if(customerId == 0) throw;  // UUIDv4 sanity check
+     if (ecrecover(hash, v, r, s) != signerAddress) revert();
+     if(customerId == 0) revert();  // UUIDv4 sanity check
      investInternal(addr, customerId);
   }
 
@@ -93,8 +93,8 @@ contract Crowdsale is CrowdsaleBase {
    * Track who is the customer making the payment so we can send thank you email.
    */
   function investWithCustomerId(address addr, uint128 customerId) public payable {
-    if(requiredSignedAddress) throw; // Crowdsale allows only server-side signed participants
-    if(customerId == 0) throw;  // UUIDv4 sanity check
+    if(requiredSignedAddress) revert(); // Crowdsale allows only server-side signed participants
+    if(customerId == 0) revert();  // UUIDv4 sanity check
     investInternal(addr, customerId);
   }
 
@@ -102,8 +102,8 @@ contract Crowdsale is CrowdsaleBase {
    * Allow anonymous contributions to this crowdsale.
    */
   function invest(address addr) public payable {
-    if(requireCustomerId) throw; // Crowdsale needs to track participants for thank you email
-    if(requiredSignedAddress) throw; // Crowdsale allows only server-side signed participants
+    if(requireCustomerId) revert(); // Crowdsale needs to track participants for thank you email
+    if(requiredSignedAddress) revert(); // Crowdsale allows only server-side signed participants
     investInternal(addr, 0);
   }
 
@@ -121,7 +121,7 @@ contract Crowdsale is CrowdsaleBase {
    */
   function buyWithCustomerIdWithChecksum(uint128 customerId, bytes1 checksum) public payable {
     // see customerid.py
-    if (bytes1(sha3(customerId)) != checksum) throw;
+    if (bytes1(keccak256(customerId)) != checksum) revert();
     investWithCustomerId(msg.sender, customerId);
   }
 
@@ -145,7 +145,7 @@ contract Crowdsale is CrowdsaleBase {
    * Set policy do we need to have server-side customer ids for the investments.
    *
    */
-  function setRequireCustomerId(bool value) onlyOwner {
+  function setRequireCustomerId(bool value) onlyOwner  public {
     requireCustomerId = value;
     InvestmentPolicyChanged(requireCustomerId, requiredSignedAddress, signerAddress);
   }
@@ -156,7 +156,7 @@ contract Crowdsale is CrowdsaleBase {
    * This is e.g. for the accredited investor clearing.
    *
    */
-  function setRequireSignedAddress(bool value, address _signerAddress) onlyOwner {
+  function setRequireSignedAddress(bool value, address _signerAddress) onlyOwner  public {
     requiredSignedAddress = value;
     signerAddress = _signerAddress;
     InvestmentPolicyChanged(requireCustomerId, requiredSignedAddress, signerAddress);

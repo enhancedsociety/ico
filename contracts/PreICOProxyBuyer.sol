@@ -88,22 +88,22 @@ contract PreICOProxyBuyer is Ownable, Haltable {
   /**
    * Create presale contract where lock up period is given days
    */
-  function PreICOProxyBuyer(address _owner, uint _freezeEndsAt, uint _weiMinimumLimit, uint _weiMaximumLimit, uint _weiCap) {
+  function PreICOProxyBuyer(address _owner, uint _freezeEndsAt, uint _weiMinimumLimit, uint _weiMaximumLimit, uint _weiCap)  public {
 
     owner = _owner;
 
     // Give argument
     if(_freezeEndsAt == 0) {
-      throw;
+      revert();
     }
 
     // Give argument
     if(_weiMinimumLimit == 0) {
-      throw;
+      revert();
     }
 
     if(_weiMaximumLimit == 0) {
-      throw;
+      revert();
     }
 
     weiMinimumLimit = _weiMinimumLimit;
@@ -117,7 +117,7 @@ contract PreICOProxyBuyer is Ownable, Haltable {
    */
   function getToken() public constant returns(FractionalERC20) {
     if(address(crowdsale) == 0)  {
-      throw;
+      revert();
     }
 
     return crowdsale.token();
@@ -129,9 +129,9 @@ contract PreICOProxyBuyer is Ownable, Haltable {
   function invest(uint128 customerId) private {
 
     // Cannot invest anymore through crowdsale when moving has begun
-    if(getState() != State.Funding) throw;
+    if(getState() != State.Funding) revert();
 
-    if(msg.value == 0) throw; // No empty buys
+    if(msg.value == 0) revert(); // No empty buys
 
     address investor = msg.sender;
 
@@ -141,7 +141,7 @@ contract PreICOProxyBuyer is Ownable, Haltable {
 
     // Need to satisfy minimum and maximum limits
     if(balances[investor] < weiMinimumLimit || balances[investor] > weiMaximumLimit) {
-      throw;
+      revert();
     }
 
     // This is a new investor
@@ -152,7 +152,7 @@ contract PreICOProxyBuyer is Ownable, Haltable {
 
     weiRaised = weiRaised.add(msg.value);
     if(weiRaised > weiCap) {
-      throw;
+      revert();
     }
 
     // We will use the same event form the Crowdsale for compatibility reasons
@@ -178,11 +178,11 @@ contract PreICOProxyBuyer is Ownable, Haltable {
 
     if(getState() != State.Funding) {
       // Only allow buy once
-      throw;
+      revert();
     }
 
     // Crowdsale not yet set
-    if(address(crowdsale) == 0) throw;
+    if(address(crowdsale) == 0) revert();
 
     // Buy tokens on the contract
     crowdsale.invest.value(weiRaised)(address(this));
@@ -192,7 +192,7 @@ contract PreICOProxyBuyer is Ownable, Haltable {
 
     if(tokensBought == 0) {
       // Did not get any tokens
-      throw;
+      revert();
     }
 
     TokensBoughts(tokensBought);
@@ -205,7 +205,7 @@ contract PreICOProxyBuyer is Ownable, Haltable {
 
     // Claims can be only made if we manage to buy tokens
     if(getState() != State.Distributing) {
-      throw;
+      revert();
     }
     return balances[investor].mul(tokensBought) / weiRaised;
   }
@@ -220,7 +220,7 @@ contract PreICOProxyBuyer is Ownable, Haltable {
   /**
    * Claim all remaining tokens for this investor.
    */
-  function claimAll() {
+  function claimAll()  public {
     claim(getClaimLeft(msg.sender));
   }
 
@@ -228,18 +228,18 @@ contract PreICOProxyBuyer is Ownable, Haltable {
    * Claim N bought tokens to the investor as the msg sender.
    *
    */
-  function claim(uint amount) stopInEmergency {
+  function claim(uint amount) stopInEmergency  public {
     require (now > timeLock);
 
     address investor = msg.sender;
 
     if(amount == 0) {
-      throw;
+      revert();
     }
 
     if(getClaimLeft(investor) < amount) {
       // Woops we cannot get more than we have left
-      throw;
+      revert();
     }
 
     // We track who many investor have (partially) claimed their tokens
@@ -257,16 +257,16 @@ contract PreICOProxyBuyer is Ownable, Haltable {
   /**
    * ICO never happened. Allow refund.
    */
-  function refund() stopInEmergency {
+  function refund() stopInEmergency  public {
 
     // Trying to ask refund too soon
-    if(getState() != State.Refunding) throw;
+    if(getState() != State.Refunding) revert();
 
     address investor = msg.sender;
-    if(balances[investor] == 0) throw;
+    if(balances[investor] == 0) revert();
     uint amount = balances[investor];
     delete balances[investor];
-    if(!(investor.call.value(amount)())) throw;
+    investor.transfer(amount);
     Refunded(investor, amount);
   }
 
@@ -296,7 +296,7 @@ contract PreICOProxyBuyer is Ownable, Haltable {
   ///      we can't use Crowdsale's refund, since our default function does not
   ///      accept money in.
   function loadRefund() public payable {
-    if(getState() != State.Refunding) throw;
+    if(getState() != State.Refunding) revert();
   }
 
   /**
@@ -323,7 +323,7 @@ contract PreICOProxyBuyer is Ownable, Haltable {
   }
 
   /** Explicitly call function from your wallet. */
-  function() payable {
-    throw;
+  function() payable  public {
+    revert();
   }
 }

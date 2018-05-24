@@ -4,11 +4,12 @@
  * Licensed under the Apache License, version 2.0: https://github.com/TokenMarketNet/ico/blob/master/LICENSE.txt
  */
 
+pragma solidity ^0.4.6;
 import "zeppelin/contracts/token/ERC20/ERC20.sol";
 import "./StandardTokenExt.sol";
 import "./SafeMathLib.sol";
 
-pragma solidity ^0.4.6;
+
 
 /**
  * A token that can increase its supply by another contract.
@@ -54,14 +55,14 @@ contract MintableToken is StandardTokenExt {
   modifier onlyMintAgent() {
     // Only crowdsale contracts are allowed to mint new tokens
     if(!mintAgents[msg.sender]) {
-        throw;
+        revert();
     }
     _;
   }
 
   /** Make sure we are not done yet. */
   modifier canMint() {
-    if(mintingFinished) throw;
+    if(mintingFinished) revert();
     _;
   }
 }

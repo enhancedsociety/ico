@@ -109,7 +109,7 @@ contract CrowdsaleBase is Haltable, Whitelist {
   // Crowdsale end time has been changed
   event EndsAtChanged(uint newEndsAt);
 
-  function CrowdsaleBase(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal) {
+  function CrowdsaleBase(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal)  public {
 
     owner = msg.sender;
 
@@ -118,24 +118,24 @@ contract CrowdsaleBase is Haltable, Whitelist {
 
     multisigWallet = _multisigWallet;
     if(multisigWallet == 0) {
-        throw;
+        revert();
     }
 
     if(_start == 0) {
-        throw;
+        revert();
     }
 
     startsAt = _start;
 
     if(_end == 0) {
-        throw;
+        revert();
     }
 
     endsAt = _end;
 
     // Don't mess the dates
     if(startsAt >= endsAt) {
-        throw;
+        revert();
     }
 
     // Minimum funding goal can be zero
@@ -171,14 +171,14 @@ contract CrowdsaleBase is Haltable, Whitelist {
     if(getState() == State.PreFunding) {
       // Are we whitelisted for early deposit
       if(!earlyParticipantWhitelist[receiver]) {
-        throw;
+        revert();
       }
     } else if(getState() == State.Funding) {
       // Retail participants can only come in when the crowdsale is running
       // pass
     } else {
       // Unwanted state
-      throw;
+      revert();
     }
 
     uint weiAmount = msg.value;
@@ -212,7 +212,7 @@ contract CrowdsaleBase is Haltable, Whitelist {
     assignTokens(receiver, tokenAmount);
 
     // Pocket the money, or fail the crowdsale if we for some reason cannot send the money to our multisig
-    if(!multisigWallet.send(weiAmount)) throw;
+    if(!multisigWallet.send(weiAmount)) revert();
 
     // Tell us invest was success
     Invested(receiver, weiAmount, tokenAmount, customerId);
@@ -229,7 +229,7 @@ contract CrowdsaleBase is Haltable, Whitelist {
 
     // Already finalized
     if(finalized) {
-      throw;
+      revert();
     }
 
     // Finalizing is optional. We only call it if we are given a finalizing agent.
@@ -245,12 +245,12 @@ contract CrowdsaleBase is Haltable, Whitelist {
    *
    * Design choice: no state restrictions on setting this, so that we can fix fat finger mistakes.
    */
-  function setFinalizeAgent(FinalizeAgent addr) onlyOwner {
+  function setFinalizeAgent(FinalizeAgent addr) onlyOwner  public {
     finalizeAgent = addr;
 
     // Don't allow setting bad agent
     if(!finalizeAgent.isFinalizeAgent()) {
-      throw;
+      revert();
     }
   }
 
@@ -264,14 +264,14 @@ contract CrowdsaleBase is Haltable, Whitelist {
    * but we trust owners know what they are doing.
    *
    */
-  function setEndsAt(uint time) onlyOwner {
+  function setEndsAt(uint time) onlyOwner  public {
 
     if(now > time) {
-      throw; // Don't change past
+      revert(); // Don't change past
     }
 
     if(startsAt > time) {
-      throw; // Prevent human mistakes
+      revert(); // Prevent human mistakes
     }
 
     endsAt = time;
@@ -283,12 +283,12 @@ contract CrowdsaleBase is Haltable, Whitelist {
    *
    * Design choice: no state restrictions on the set, so that we can fix fat finger mistakes.
    */
-  function setPricingStrategy(PricingStrategy _pricingStrategy) onlyOwner {
+  function setPricingStrategy(PricingStrategy _pricingStrategy) onlyOwner  public {
     pricingStrategy = _pricingStrategy;
 
     // Don't allow setting bad agent
     if(!pricingStrategy.isPricingStrategy()) {
-      throw;
+      revert();
     }
   }
 
@@ -303,7 +303,7 @@ contract CrowdsaleBase is Haltable, Whitelist {
 
     // Change
     if(investorCount > MAX_INVESTMENTS_BEFORE_MULTISIG_CHANGE) {
-      throw;
+      revert();
     }
 
     multisigWallet = addr;
@@ -315,7 +315,7 @@ contract CrowdsaleBase is Haltable, Whitelist {
    * The team can transfer the funds back on the smart contract in the case the minimum goal was not reached..
    */
   function loadRefund() public payable inState(State.Failure) {
-    if(msg.value == 0) throw;
+    if(msg.value == 0) revert();
     loadedRefund = loadedRefund.plus(msg.value);
   }
 
@@ -327,11 +327,11 @@ contract CrowdsaleBase is Haltable, Whitelist {
    */
   function refund() public inState(State.Refunding) {
     uint256 weiValue = investedAmountOf[msg.sender];
-    if (weiValue == 0) throw;
+    if (weiValue == 0) revert();
     investedAmountOf[msg.sender] = 0;
     weiRefunded = weiRefunded.plus(weiValue);
     Refund(msg.sender, weiValue);
-    if (!msg.sender.send(weiValue)) throw;
+    if (!msg.sender.send(weiValue)) revert();
   }
 
   /**
@@ -373,7 +373,7 @@ contract CrowdsaleBase is Haltable, Whitelist {
   }
 
   /** This is for manual testing of multisig wallet interaction */
-  function setOwnerTestValue(uint val) onlyOwner {
+  function setOwnerTestValue(uint val) onlyOwner  public {
     ownerTestValue = val;
   }
 
@@ -382,7 +382,7 @@ contract CrowdsaleBase is Haltable, Whitelist {
    *
    * TODO: Fix spelling error in the name
    */
-  function setEarlyParicipantWhitelist(address addr, bool status) onlyOwner {
+  function setEarlyParicipantWhitelist(address addr, bool status) onlyOwner  public {
     earlyParticipantWhitelist[addr] = status;
     Whitelisted(addr, status);
   }
@@ -399,7 +399,7 @@ contract CrowdsaleBase is Haltable, Whitelist {
 
   /** Modified allowing execution only if the crowdsale is currently running.  */
   modifier inState(State state) {
-    if(getState() != state) throw;
+    if(getState() != state) revert();
     _;
   }
 
@@ -423,7 +423,7 @@ contract CrowdsaleBase is Haltable, Whitelist {
    *
    * @return true if taking this investment would break our cap rules
    */
-  function isBreakingCap(uint weiAmount, uint tokenAmount, uint weiRaisedTotal, uint tokensSoldTotal) constant returns (bool limitBroken);
+  function isBreakingCap(uint weiAmount, uint tokenAmount, uint weiRaisedTotal, uint tokensSoldTotal) constant public returns (bool limitBroken);
 
   /**
    * Check if the current crowdsale is full and we can no longer sell any tokens.

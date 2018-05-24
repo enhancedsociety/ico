@@ -39,7 +39,7 @@ contract IssuerWithId is Ownable {
   /** Issue event **/
   event Issued(address benefactor, uint amount, uint id);
 
-  function IssuerWithId(address _owner, address _allower, StandardTokenExt _token) {
+  function IssuerWithId(address _owner, address _allower, StandardTokenExt _token)  public {
     require(address(_owner) != address(0));
     require(address(_allower) != address(0));
     require(address(_token) != address(0));
@@ -49,8 +49,8 @@ contract IssuerWithId is Ownable {
     token = _token;
   }
 
-  function issue(address benefactor, uint amount, uint id) onlyOwner {
-    if(issued[id]) throw;
+  function issue(address benefactor, uint amount, uint id) onlyOwner  public {
+    if(issued[id]) revert();
     token.transferFrom(allower, benefactor, amount);
     issued[id] = true;
     issuedCount += amount;

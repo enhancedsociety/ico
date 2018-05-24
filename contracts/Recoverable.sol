@@ -12,7 +12,7 @@ import "zeppelin/contracts/token/ERC20/ERC20Basic.sol";
 contract Recoverable is Ownable {
 
   /// @dev Empty constructor (for now)
-  function Recoverable() {
+  function Recoverable()  public {
   }
 
   /// @dev This will be invoked by the owner, when owner wants to rescue tokens

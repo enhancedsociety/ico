@@ -15,7 +15,7 @@ library BytesDeserializer {
   /**
    * Extract 256-bit worth of data from the bytes stream.
    */
-  function slice32(bytes b, uint offset) constant returns (bytes32) {
+  function slice32(bytes b, uint offset) constant public returns (bytes32) {
     bytes32 out;
 
     for (uint i = 0; i < 32; i++) {
@@ -27,7 +27,7 @@ library BytesDeserializer {
   /**
    * Extract Ethereum address worth of data from the bytes stream.
    */
-  function sliceAddress(bytes b, uint offset) constant returns (address) {
+  function sliceAddress(bytes b, uint offset) constant public returns (address) {
     bytes32 out;
 
     for (uint i = 0; i < 20; i++) {
@@ -39,7 +39,7 @@ library BytesDeserializer {
   /**
    * Extract 128-bit worth of data from the bytes stream.
    */
-  function slice16(bytes b, uint offset) constant returns (bytes16) {
+  function slice16(bytes b, uint offset) constant public returns (bytes16) {
     bytes16 out;
 
     for (uint i = 0; i < 16; i++) {
@@ -51,7 +51,7 @@ library BytesDeserializer {
   /**
    * Extract 32-bit worth of data from the bytes stream.
    */
-  function slice4(bytes b, uint offset) constant returns (bytes4) {
+  function slice4(bytes b, uint offset) constant public returns (bytes4) {
     bytes4 out;
 
     for (uint i = 0; i < 4; i++) {
@@ -63,7 +63,7 @@ library BytesDeserializer {
   /**
    * Extract 16-bit worth of data from the bytes stream.
    */
-  function slice2(bytes b, uint offset) constant returns (bytes2) {
+  function slice2(bytes b, uint offset) constant public returns (bytes2) {
     bytes2 out;
 
     for (uint i = 0; i < 2; i++) {

@@ -33,7 +33,7 @@ contract KYCPresale is CrowdsaleBase, KYCPayloadDeserializer {
    *
    * @dev The parent contract has some unnecessary variables for our use case. For this round of development, we chose to use null value for token and pricing strategy. In the future versions have a parent sale contract that does not assume an existing token.
    */
-  function KYCPresale(address _multisigWallet, uint _start, uint _end, uint _saleWeiCap) CrowdsaleBase(FractionalERC20(address(1)), PricingStrategy(address(0)), _multisigWallet, _start, _end, 0) {
+  function KYCPresale(address _multisigWallet, uint _start, uint _end, uint _saleWeiCap) CrowdsaleBase(FractionalERC20(address(1)), PricingStrategy(address(0)), _multisigWallet, _start, _end, 0)  public {
     saleWeiCap = _saleWeiCap;
   }
 
@@ -96,7 +96,7 @@ contract KYCPresale is CrowdsaleBase, KYCPayloadDeserializer {
 
   /// @dev This function can set the server side address
   /// @param _signerAddress The address derived from server's private key
-  function setSignerAddress(address _signerAddress) onlyOwner {
+  function setSignerAddress(address _signerAddress) onlyOwner  public {
     signerAddress = _signerAddress;
     SignerChanged(signerAddress);
   }
@@ -104,7 +104,7 @@ contract KYCPresale is CrowdsaleBase, KYCPayloadDeserializer {
   /**
    * Called from invest() to confirm if the curret investment does not break our cap rule.
    */
-  function isBreakingCap(uint weiAmount, uint tokenAmount, uint weiRaisedTotal, uint tokensSoldTotal) constant returns (bool limitBroken) {
+  function isBreakingCap(uint weiAmount, uint tokenAmount, uint weiRaisedTotal, uint tokensSoldTotal) constant public returns (bool limitBroken) {
     if(weiRaisedTotal > saleWeiCap) {
       return true;
     } else {
@@ -143,7 +143,7 @@ contract KYCPresale is CrowdsaleBase, KYCPayloadDeserializer {
    *
    * @dev Because we do not have token price set in presale, we do nothing. This will be removed in the future versions.
    */
-  function setPricingStrategy(PricingStrategy _pricingStrategy) onlyOwner {
+  function setPricingStrategy(PricingStrategy _pricingStrategy) onlyOwner  public {
   }
 
   /**

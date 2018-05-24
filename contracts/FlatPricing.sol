@@ -19,7 +19,7 @@ contract FlatPricing is PricingStrategy {
   /* How many weis one token costs */
   uint public oneTokenInWei;
 
-  function FlatPricing(uint _oneTokenInWei) {
+  function FlatPricing(uint _oneTokenInWei)  public {
     require(_oneTokenInWei > 0);
     oneTokenInWei = _oneTokenInWei;
   }

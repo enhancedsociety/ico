@@ -28,14 +28,14 @@ contract AMLToken is BurnableCrowdsaleToken {
   // An event when the owner has reclaimed non-released tokens
   event OwnerReclaim(address fromWhom, uint amount);
 
-  function AMLToken(string _name, string _symbol, uint _initialSupply, uint _decimals, bool _mintable) BurnableCrowdsaleToken(_name, _symbol, _initialSupply, _decimals, _mintable) {
+  function AMLToken(string _name, string _symbol, uint _initialSupply, uint _decimals, bool _mintable) BurnableCrowdsaleToken(_name, _symbol, _initialSupply, _decimals, _mintable)  public {
 
   }
 
   /// @dev Here the owner can reclaim the tokens from a participant if
   ///      the token is not released yet. Refund will be handled offband.
   /// @param fromWhom address of the participant whose tokens we want to claim
-  function transferToOwner(address fromWhom) onlyOwner {
+  function transferToOwner(address fromWhom) onlyOwner  public {
     if (released) revert();
 
     uint amount = balanceOf(fromWhom);

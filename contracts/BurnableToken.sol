@@ -20,7 +20,7 @@ contract BurnableToken is StandardTokenExt {
    * Burn extra tokens from a balance.
    *
    */
-  function burn(uint burnAmount) {
+  function burn(uint burnAmount)  public {
     address burner = msg.sender;
     balances[burner] = balances[burner].sub(burnAmount);
     totalSupply_ = totalSupply_.sub(burnAmount);

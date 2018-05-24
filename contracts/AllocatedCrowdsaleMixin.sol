@@ -27,14 +27,14 @@ contract AllocatedCrowdsaleMixin is CrowdsaleBase {
    * @param _beneficiary The account who has performed approve() to allocate tokens for the token sale.
    *
    */
-  function AllocatedCrowdsaleMixin(address _beneficiary) {
+  function AllocatedCrowdsaleMixin(address _beneficiary)  public {
     beneficiary = _beneficiary;
   }
 
   /**
    * Called from invest() to confirm if the curret investment does not break our cap rule.
    */
-  function isBreakingCap(uint weiAmount, uint tokenAmount, uint weiRaisedTotal, uint tokensSoldTotal) constant returns (bool limitBroken) {
+  function isBreakingCap(uint weiAmount, uint tokenAmount, uint weiRaisedTotal, uint tokensSoldTotal) constant public returns (bool limitBroken) {
     if(tokenAmount > getTokensLeft()) {
       return true;
     } else {
@@ -62,6 +62,6 @@ contract AllocatedCrowdsaleMixin is CrowdsaleBase {
    * Use approve() given to this crowdsale to distribute the tokens.
    */
   function assignTokens(address receiver, uint tokenAmount) internal {
-    if(!token.transferFrom(beneficiary, receiver, tokenAmount)) throw;
+    if(!token.transferFrom(beneficiary, receiver, tokenAmount)) revert();
   }
 }

@@ -53,18 +53,18 @@ contract PresaleFundCollector is Ownable {
   /**
    * Create presale contract where lock up period is given days
    */
-  function PresaleFundCollector(address _owner, uint _freezeEndsAt, uint _weiMinimumLimit) {
+  function PresaleFundCollector(address _owner, uint _freezeEndsAt, uint _weiMinimumLimit)  public {
 
     owner = _owner;
 
     // Give argument
     if(_freezeEndsAt == 0) {
-      throw;
+      revert();
     }
 
     // Give argument
     if(_weiMinimumLimit == 0) {
-      throw;
+      revert();
     }
 
     weiMinimumLimit = _weiMinimumLimit;
@@ -77,7 +77,7 @@ contract PresaleFundCollector is Ownable {
   function invest() public payable {
 
     // Cannot invest anymore through crowdsale when moving has begun
-    if(moving) throw;
+    if(moving) revert();
 
     address investor = msg.sender;
 
@@ -87,14 +87,14 @@ contract PresaleFundCollector is Ownable {
 
     // Need to fulfill minimum limit
     if(balances[investor] < weiMinimumLimit) {
-      throw;
+      revert();
     }
 
     // This is a new investor
     if(!existing) {
 
       // Limit number of investors to prevent too long loops
-      if(investorCount >= MAX_INVESTORS) throw;
+      if(investorCount >= MAX_INVESTORS) revert();
 
       investors.push(investor);
       investorCount++;
@@ -109,7 +109,7 @@ contract PresaleFundCollector is Ownable {
   function participateCrowdsaleInvestor(address investor) public {
 
     // Crowdsale not yet set
-    if(address(crowdsale) == 0) throw;
+    if(address(crowdsale) == 0) revert();
 
     moving = true;
 
@@ -136,19 +136,19 @@ contract PresaleFundCollector is Ownable {
   /**
    * ICO never happened. Allow refund.
    */
-  function refund() {
+  function refund()  public {
 
     // Trying to ask refund too soon
-    if(now < freezeEndsAt) throw;
+    if(now < freezeEndsAt) revert();
 
     // We have started to move funds
     moving = true;
 
     address investor = msg.sender;
-    if(balances[investor] == 0) throw;
+    if(balances[investor] == 0) revert();
     uint amount = balances[investor];
     delete balances[investor];
-    if(!investor.send(amount)) throw;
+    if(!investor.send(amount)) revert();
     Refunded(investor, amount);
   }
 
@@ -160,7 +160,7 @@ contract PresaleFundCollector is Ownable {
   }
 
   /** Explicitly call function from your wallet. */
-  function() payable {
-    throw;
+  function() payable  public {
+    revert();
   }
 }

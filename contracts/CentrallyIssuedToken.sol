@@ -30,7 +30,7 @@ contract CentrallyIssuedToken is BurnableToken, UpgradeableToken {
   /** Name and symbol were updated. */
   event UpdatedTokenInformation(string newName, string newSymbol);
 
-  function CentrallyIssuedToken(address _owner, string _name, string _symbol, uint _totalSupply, uint _decimals, uint _releaseFinalizationDate)  UpgradeableToken(_owner) {
+  function CentrallyIssuedToken(address _owner, string _name, string _symbol, uint _totalSupply, uint _decimals, uint _releaseFinalizationDate)  UpgradeableToken(_owner)  public {
     name = _name;
     symbol = _symbol;
     totalSupply_ = _totalSupply;
@@ -52,10 +52,10 @@ contract CentrallyIssuedToken is BurnableToken, UpgradeableToken {
    * This function allows the token owner to rename the token after the operations
    * have been completed and then point the audience to use the token contract.
    */
-  function setTokenInformation(string _name, string _symbol) {
+  function setTokenInformation(string _name, string _symbol)  public {
 
     if(msg.sender != upgradeMaster) {
-      throw;
+      revert();
     }
 
     name = _name;
@@ -68,11 +68,11 @@ contract CentrallyIssuedToken is BurnableToken, UpgradeableToken {
    * Kill switch for the token in the case of distribution issue.
    *
    */
-  function transfer(address _to, uint _value) returns (bool success) {
+  function transfer(address _to, uint _value) public returns (bool success) {
 
     if(now > releaseFinalizationDate) {
       if(!released) {
-        throw;
+        revert();
       }
     }
 
@@ -82,9 +82,9 @@ contract CentrallyIssuedToken is BurnableToken, UpgradeableToken {
   /**
    * One way function to perform the final token release.
    */
-  function releaseTokenTransfer() {
+  function releaseTokenTransfer()  public {
     if(msg.sender != upgradeMaster) {
-      throw;
+      revert();
     }
 
     released = true;

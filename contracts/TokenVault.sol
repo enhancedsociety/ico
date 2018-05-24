@@ -83,30 +83,30 @@ contract TokenVault is Ownable, Recoverable {
    * @param _tokensToBeAllocated Total number of tokens this vault will hold - including decimal multiplcation
    *
    */
-  function TokenVault(address _owner, uint _freezeEndsAt, StandardTokenExt _token, uint _tokensToBeAllocated) {
+  function TokenVault(address _owner, uint _freezeEndsAt, StandardTokenExt _token, uint _tokensToBeAllocated)  public {
 
     owner = _owner;
 
     // Invalid owenr
     if(owner == 0) {
-      throw;
+      revert();
     }
 
     token = _token;
 
     // Check the address looks like a token contract
     if(!token.isToken()) {
-      throw;
+      revert();
     }
 
     // Give argument
     if(_freezeEndsAt == 0) {
-      throw;
+      revert();
     }
 
     // Sanity check on _tokensToBeAllocated
     if(_tokensToBeAllocated == 0) {
-      throw;
+      revert();
     }
 
     freezeEndsAt = _freezeEndsAt;
@@ -118,14 +118,14 @@ contract TokenVault is Ownable, Recoverable {
 
     if(lockedAt > 0) {
       // Cannot add new investors after the vault is locked
-      throw;
+      revert();
     }
 
-    if(amount == 0) throw; // No empty buys
+    if(amount == 0) revert(); // No empty buys
 
     // Don't allow reset
     if(balances[investor] > 0) {
-      throw;
+      revert();
     }
 
     balances[investor] = amount;
@@ -141,20 +141,20 @@ contract TokenVault is Ownable, Recoverable {
   ///      - All balances have been loaded in correctly
   ///      - Tokens are transferred on this vault correctly
   ///      - Checks are in place to prevent creating a vault that is locked with incorrect token balances.
-  function lock() onlyOwner {
+  function lock() onlyOwner  public {
 
     if(lockedAt > 0) {
-      throw; // Already locked
+      revert(); // Already locked
     }
 
     // Spreadsheet sum does not match to what we have loaded to the investor data
     if(tokensAllocatedTotal != tokensToBeAllocated) {
-      throw;
+      revert();
     }
 
     // Do not lock the vault if the given tokens are not on this contract
     if(token.balanceOf(address(this)) != tokensAllocatedTotal) {
-      throw;
+      revert();
     }
 
     lockedAt = now;
@@ -163,9 +163,9 @@ contract TokenVault is Ownable, Recoverable {
   }
 
   /// @dev In the case locking failed, then allow the owner to reclaim the tokens on the contract.
-  function recoverFailedLock() onlyOwner {
+  function recoverFailedLock() onlyOwner  public {
     if(lockedAt > 0) {
-      throw;
+      revert();
     }
 
     // Transfer all tokens on this contract back to the owner
@@ -179,25 +179,25 @@ contract TokenVault is Ownable, Recoverable {
   }
 
   /// @dev Claim N bought tokens to the investor as the msg sender
-  function claim() {
+  function claim()  public {
 
     address investor = msg.sender;
 
     if(lockedAt == 0) {
-      throw; // We were never locked
+      revert(); // We were never locked
     }
 
     if(now < freezeEndsAt) {
-      throw; // Trying to claim early
+      revert(); // Trying to claim early
     }
 
     if(balances[investor] == 0) {
       // Not our investor
-      throw;
+      revert();
     }
 
     if(claimed[investor] > 0) {
-      throw; // Already claimed
+      revert(); // Already claimed
     }
 
     uint amount = balances[investor];

@@ -10,11 +10,11 @@ contract SimpleReleaseAgent {
 
   ReleasableToken token;
 
-  function SimpleReleaseAgent(ReleasableToken _token) {
+  function SimpleReleaseAgent(ReleasableToken _token)  public {
     token = _token;
   }
 
-  function release() {
+  function release()  public {
     token.releaseTokenTransfer();
   }
 }

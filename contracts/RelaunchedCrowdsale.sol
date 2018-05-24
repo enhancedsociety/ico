@@ -24,7 +24,7 @@ contract RelaunchedCrowdsale is MintedTokenCappedCrowdsale {
 
   mapping(uint => bool) public reissuedTransactions;
 
-  function RelaunchedCrowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal, uint _maximumSellableTokens) MintedTokenCappedCrowdsale(_token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal, _maximumSellableTokens) {
+  function RelaunchedCrowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal, uint _maximumSellableTokens) MintedTokenCappedCrowdsale(_token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal, _maximumSellableTokens)  public {
   }
 
   /**
@@ -60,14 +60,14 @@ contract RelaunchedCrowdsale is MintedTokenCappedCrowdsale {
 
     // This transaction has already been rebuild
     if(reissuedTransactions[_originalTxHash]) {
-      throw;
+      revert();
     }
 
     setInvestorData(_addr, _weiAmount, _tokenAmount, _originalTxHash);
 
     // Check that we did not bust the cap in the restoration process
     if(isBreakingCap(_weiAmount, _tokenAmount, weiRaised, tokensSold)) {
-      throw;
+      revert();
     }
 
     // Mark transaction processed

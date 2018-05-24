@@ -20,7 +20,7 @@ contract KYCCrowdsale is AllocatedCrowdsaleMixin, KYCPayloadDeserializer {
   /**
    * Constructor.
    */
-  function KYCCrowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal, address _beneficiary) CrowdsaleBase(_token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal) AllocatedCrowdsaleMixin(_beneficiary) {
+  function KYCCrowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal, address _beneficiary) CrowdsaleBase(_token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal) AllocatedCrowdsaleMixin(_beneficiary)  public {
 
   }
 
@@ -70,7 +70,7 @@ contract KYCCrowdsale is AllocatedCrowdsaleMixin, KYCPayloadDeserializer {
 
   /// @dev This function can set the server side address
   /// @param _signerAddress The address derived from server's private key
-  function setSignerAddress(address _signerAddress) onlyOwner {
+  function setSignerAddress(address _signerAddress) onlyOwner  public {
     signerAddress = _signerAddress;
     SignerChanged(signerAddress);
   }

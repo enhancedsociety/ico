@@ -34,16 +34,16 @@ contract BonusFinalizeAgent is FinalizeAgent {
   /* How much bonus tokens we allocated */
   uint public allocatedBonus;
 
-  function BonusFinalizeAgent(CrowdsaleToken _token, Crowdsale _crowdsale, uint _bonusBasePoints, address _teamMultisig) {
+  function BonusFinalizeAgent(CrowdsaleToken _token, Crowdsale _crowdsale, uint _bonusBasePoints, address _teamMultisig)  public {
     token = _token;
     crowdsale = _crowdsale;
     if(address(crowdsale) == 0) {
-      throw;
+      revert();
     }
 
     teamMultisig = _teamMultisig;
     if(address(teamMultisig) == 0) {
-      throw;
+      revert();
     }
 
     bonusBasePoints = _bonusBasePoints;
@@ -55,9 +55,9 @@ contract BonusFinalizeAgent is FinalizeAgent {
   }
 
   /** Called once by crowdsale finalize() if the sale was success. */
-  function finalizeCrowdsale() {
+  function finalizeCrowdsale()  public {
     if(msg.sender != address(crowdsale)) {
-      throw;
+      revert();
     }
 
     // How many % of tokens the founders and others get
