@@ -21,10 +21,12 @@ contract BurnableToken is StandardTokenExt {
    *
    */
   function burn(uint burnAmount)  public {
+    require(totalSupply_ >= burnAmount);
     address burner = msg.sender;
+    require(balances[burner] >= burnAmount);
     balances[burner] = balances[burner].sub(burnAmount);
     totalSupply_ = totalSupply_.sub(burnAmount);
-    Burned(burner, burnAmount);
+    emit Burned(burner, burnAmount);
 
     // Inform the blockchain explores that track the
     // balances only by a transfer event that the balance in this
