@@ -41,7 +41,7 @@ contract MintableToken is StandardTokenExt {
 
     // This will make the mint transaction apper in EtherScan.io
     // We can remove this after there is a standardized minting event
-    Transfer(0, receiver, amount);
+    emit Transfer(0, receiver, amount);
   }
 
   /**
@@ -49,7 +49,7 @@ contract MintableToken is StandardTokenExt {
    */
   function setMintAgent(address addr, bool state) onlyOwner canMint public {
     mintAgents[addr] = state;
-    MintingAgentChanged(addr, state);
+    emit MintingAgentChanged(addr, state);
   }
 
   modifier onlyMintAgent() {
