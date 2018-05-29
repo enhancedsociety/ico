@@ -1,7 +1,7 @@
-# python3 ico/cmd/deploycontracts.py --deployment-file crowdsales/YPB.yml --deployment-name YPB-token --address 0x727eFEdDfAAe32231415a0Ab457785DBf6AFf9b2
+# python3 ico/cmd/deploycontracts.py --deployment-file crowdsales/ESI_CS.yml --deployment-name ESI-token --address 0x3a514b826d8235dfbfc7e67f9d7f6173e9c109ed
 
 # This is the deployment-name parameter.
-YPB-token:
+ESI-token:
 
     # This is the chain name in populus.json
     chain: local
@@ -112,21 +112,28 @@ YPB-token:
             confirm_tx(token.transact({"from": deploy_address}).setMintAgent(crowdsale.address, True))
 
             # Make sure crowdsale contract and these accounts can transfer tokens despite transfer lock up
+            confirm_tx(token.transact({"from": deploy_address}).setTransferAgent(team_multisig.address, True))
             confirm_tx(token.transact({"from": deploy_address}).setTransferAgent(crowdsale.address, True))
+            confirm_tx(token.transact({"from": deploy_address}).setTransferAgent(deploy_address, True))
             
             # Do not do nothing at the end of the crowdsale
             confirm_tx(crowdsale.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent.address))
+            
+            # Owner can release the token transfer when they feel its time
+            confirm_tx(token.transact({"from": deploy_address}).setReleaseAgent(deploy_address))
+            confirm_tx(token.transact({"from": deploy_address}).setReleaseAgent(team_multisig.address))
                                
             # Add approved addresses to Crowdsale Whitelist
             crowdsale.transact({"from": deploy_address}).addAddressToWhitelist(deploy_address)
-            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0xA03783510256f318AD666354C39dB15d8B2F516A')
-            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x704a645E17A9F6EA9d2Be8B9c8B5748eE4c24022')
-
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x6641c30B8Ec57A6168707115b80B0af1a5cf160C')
+      
             # Set token owner to team multisig
             confirm_tx(token.transact({"from": deploy_address}).transferOwnership(team_multisig.address))
                        
             # Do a test buy using a test address.
             crowdsale.transact({"from": deploy_address, "value": to_wei("0.01", "ether")}).buy()
+               
+
 
     # Sanity check
     verify_actions: |
