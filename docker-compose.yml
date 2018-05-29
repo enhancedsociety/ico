@@ -15,6 +15,8 @@ services:
           - "./zeppelin:/usr/src/app/zeppelin"
           - "./ico:/usr/src/app/ico"
           - "./populus.json:/usr/src/app/populus.json"
+          - "/etc/timezone:/etc/timezone:ro"
+          - "/etc/localtime:/etc/localtime:ro"
 
 networks:
   testnet:

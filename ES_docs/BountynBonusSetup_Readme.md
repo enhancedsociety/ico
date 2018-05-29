@@ -131,7 +131,7 @@ Please use Token.approve() to give some allowance for the issuer contract by mas
 
 ```
 
-2. Use the Token.approve function via Ethereumwallet or Remix to set the Issuer Contract Address as a spender and the amount of Tokens it can give out.
+2. Use the Token.approve function via Ethereumwallet or Remix to set the Issuer Contract Address as a spender and the amount of Tokens it can give out. Ensure the address approving is same as the specified master-address and also has enough tokens in it to distribute 
 
 3. Rerun the Contract again to Distribute bounties to the addresses specified in the distribute.csv file. Ensure you specify the --issuer-address in this run.
 

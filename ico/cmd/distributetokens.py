@@ -112,21 +112,21 @@ def main(chain, address, token, csv_file, limit, start_from, issuer_address, add
             print("Contract constructor arguments are", const_args)
             chain_name = chain
             fname = "Issuer.sol"
-            browser_driver = "chrome"
-            verify_contract(
-                project=project,
-                libraries={},  # TODO: Figure out how to pass around
-                chain_name=chain_name,
-                address=issuer.address,
-                contract_name="Issuer",
-                contract_filename=fname,
-                constructor_args=const_args,
+            # browser_driver = "chrome"
+            # verify_contract(
+                # project=project,
+                # libraries={},  # TODO: Figure out how to pass around
+                # chain_name=chain_name,
+                # address=issuer.address,
+                # contract_name="Issuer",
+                # contract_filename=fname,
+                # constructor_args=const_args,
                 # libraries=runtime_data["contracts"][name]["libraries"],
-                browser_driver=browser_driver,
-                compiler=solc_version)
-            link = get_etherscan_link(chain_name, issuer.address)
+                # browser_driver=browser_driver,
+                # compiler=solc_version)
+            # link = get_etherscan_link(chain_name, issuer.address)
 
-            print("Issuer verified contract is", link)
+            # print("Issuer verified contract is", link)
         else:
             print("Reusing existing issuer contract")
             issuer = Issuer(address=issuer_address)

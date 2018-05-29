@@ -182,7 +182,8 @@ contract CrowdsaleBase is Haltable, Whitelist {
     }
 
     uint weiAmount = msg.value;
-
+    require(weiAmount >= minimumFundingGoal);
+    
     // Account presale sales separately, so that they do not count against pricing tranches
     uint tokenAmount = pricingStrategy.calculatePrice(weiAmount, weiRaised - presaleWeiRaised, tokensSold, msg.sender, token.decimals());
 
