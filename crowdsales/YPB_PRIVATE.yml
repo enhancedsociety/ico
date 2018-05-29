@@ -1,0 +1,115 @@
+# python3 ico/cmd/deploycontracts.py --deployment-file crowdsales/YPB_PRIVATE.yml --deployment-name YPB-token --address 0x727eFEdDfAAe32231415a0Ab457785DBf6AFf9b2
+
+# This is the deployment-name parameter.
+YPB-token:
+
+    # This is the chain name in populus.json
+    chain: local
+
+    # Use automated Chrome to verify all contracts on etherscan.io
+    verify_on_etherscan: no
+    browser_driver: chrome
+
+    solc:
+
+        # This is the Solidity version tag we verify on EtherScan.
+        version: v0.4.14+commit.c2215d46
+
+        #
+        # We supply these to EtherScan as the solc settings we used to compile the contract.
+        # They must match values in populus.json compilication / backends section.
+        #
+        optimizations:
+            optimizer: true
+            runs: 500
+
+    contracts:
+        
+        # These are the addresses of the multisig wallets . Currently set to Joint_Multisig
+        
+        team_multisig:
+            contract_name: MultiSigWallet
+            contract_file: GnosisWallet.sol
+            address: "0xCd9d9E52a40aB92a102CB9fB05843b8D50b3B17e"
+          
+        # Token contract
+        
+        token:
+            contract_name: BurnableCrowdsaleToken
+            contract_file: BurnableCrowdsaleToken.sol
+            arguments:
+                _name: "Youpinbi"
+                _symbol: "YPB"
+                _initialSupply: 0
+                _decimals: 18
+                _mintable: true
+       
+        
+        # Pricing Strategy in Wei, which is the smallest unit of ether. 1 ETH = 10^18 Wei
+        # ETH priced at 800 USD, 50% bonus tier. Price per token 0.05 USD 
+        
+        pricing_strategy:
+            contract_name: FlatPricing
+            contract_file: FlatPricing.sol
+            arguments:
+                _oneTokenInWei: 62500000000000
+                
+        
+        # Private Sale. 11 Jun to 8 Jul 2018
+        # _minimumFundingGoal is leveraged to also be the minimum contribution amount
+        
+        crowdsale:
+            contract_name: MintedTokenCappedCrowdsale
+            contract_file: MintedTokenCappedCrowdsale.sol
+            arguments:
+                _token: "{{contracts.token.address}}"
+                _pricingStrategy: "{{contracts.pricing_strategy.address}}"
+                _multisigWallet: "{{contracts.team_multisig.address}}"
+                _start: "{{ timestamp(datetime(2018, 5, 27, 00, 00)) }}"
+                _end: "{{ timestamp(datetime(2018, 7, 8, 23, 59)) }}"
+                _minimumFundingGoal: "{{ to_wei(62.5, 'ether') }}"
+                _maximumSellableTokens: "{{ to_wei(60000000, 'ether') }}"
+                    
+        finalize_agent:
+            contract_name: NullFinalizeAgent
+            contract_file: NullFinalizeAgent.sol
+            arguments:
+                _crowdsale: "{{contracts.crowdsale.address}}"
+
+    # Post-deployment actions connect contracts together.
+    post_actions: |
+    
+            # Enable new token minting by a crowdsale contract
+            confirm_tx(token.transact({"from": deploy_address}).setMintAgent(deploy_address, True))
+            confirm_tx(token.transact({"from": deploy_address}).setMintAgent(crowdsale.address, True))
+
+            # Make sure crowdsale contract and these accounts can transfer tokens despite transfer lock up
+            confirm_tx(token.transact({"from": deploy_address}).setTransferAgent(team_multisig.address, True))
+            confirm_tx(token.transact({"from": deploy_address}).setTransferAgent(crowdsale.address, True))
+            confirm_tx(token.transact({"from": deploy_address}).setTransferAgent(deploy_address, True))
+
+            # Do not do nothing at the end of the crowdsale
+            confirm_tx(crowdsale.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent.address))
+
+            # Owner can release the token transfer when they feel its time
+            confirm_tx(token.transact({"from": deploy_address}).setReleaseAgent(deploy_address))
+            confirm_tx(token.transact({"from": deploy_address}).setReleaseAgent(team_multisig.address))
+                  
+            # Add approved addresses to Crowdsale Whitelist
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist(deploy_address)     
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0xA03783510256f318AD666354C39dB15d8B2F516A')
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x704a645E17A9F6EA9d2Be8B9c8B5748eE4c24022')
+
+            # Set Crowdsale owner to team multisig but not if you will be adding whitelist addresses later.
+            # confirm_tx(crowdsale.transact({"from": deploy_address}).transferOwnership(team_multisig.address))
+            
+            # Do a test buy using a test address.
+            crowdsale.transact({"from": deploy_address, "value": to_wei("62.5", "ether")}).buy()
+
+
+    # Sanity check
+    verify_actions: |
+    
+            # assert crowdsale.call().owner() == team_multisig.address
+            assert finalize_agent.call().isSane()
+    
