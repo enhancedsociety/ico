@@ -1,4 +1,4 @@
-# python3 ico/cmd/deploycontracts.py --deployment-file crowdsales/YPB_PRIVATE.yml --deployment-name YPB-token --address 0x727eFEdDfAAe32231415a0Ab457785DBf6AFf9b2
+# python3 ico/cmd/deploycontracts.py --deployment-file crowdsales/YPB_PRIVATE.yml --deployment-name YPB-token --address 0x88d4c3A4299a3EdB91AA04147A2380F263E94E4F
 
 # This is the deployment-name parameter.
 YPB-token:
@@ -30,7 +30,7 @@ YPB-token:
         team_multisig:
             contract_name: MultiSigWallet
             contract_file: GnosisWallet.sol
-            address: "0xCd9d9E52a40aB92a102CB9fB05843b8D50b3B17e"
+            address: "0xb97cfdbbc527f1da7d2b890ab93d7a5e2a55151b"
           
         # Token contract
         
@@ -67,7 +67,7 @@ YPB-token:
                 _multisigWallet: "{{contracts.team_multisig.address}}"
                 _start: "{{ timestamp(datetime(2018, 5, 27, 00, 00)) }}"
                 _end: "{{ timestamp(datetime(2018, 7, 8, 23, 59)) }}"
-                _minimumFundingGoal: "{{ to_wei(62.5, 'ether') }}"
+                _minimumFundingGoal: "{{ to_wei(0.625, 'ether') }}"
                 _maximumSellableTokens: "{{ to_wei(60000000, 'ether') }}"
                     
         finalize_agent:
@@ -97,14 +97,17 @@ YPB-token:
                   
             # Add approved addresses to Crowdsale Whitelist
             crowdsale.transact({"from": deploy_address}).addAddressToWhitelist(deploy_address)     
-            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0xA03783510256f318AD666354C39dB15d8B2F516A')
-            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x704a645E17A9F6EA9d2Be8B9c8B5748eE4c24022')
-
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x6641c30B8Ec57A6168707115b80B0af1a5cf160C')
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0xfa13e83fa42b93e43cda0bf0ebbaf8f373ce21f2')
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x10594B019de165B051c2dD99ED484DC9DAA20005')
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x652A9f47a8Cef97E61bCCc5cc7E6B00566F8f5ae')
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0xC53980f3f373AeB70688d16E12f8f90Ab33b5A22')
+            
             # Set Crowdsale owner to team multisig but not if you will be adding whitelist addresses later.
             # confirm_tx(crowdsale.transact({"from": deploy_address}).transferOwnership(team_multisig.address))
             
             # Do a test buy using a test address.
-            crowdsale.transact({"from": deploy_address, "value": to_wei("62.5", "ether")}).buy()
+            crowdsale.transact({"from": deploy_address, "value": to_wei("0.625", "ether")}).buy()
 
 
     # Sanity check

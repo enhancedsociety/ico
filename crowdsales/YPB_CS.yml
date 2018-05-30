@@ -1,4 +1,4 @@
-# python3 ico/cmd/deploycontracts.py --deployment-file crowdsales/YPB_CS.yml --deployment-name YPB-token --address 0x727eFEdDfAAe32231415a0Ab457785DBf6AFf9b2
+# python3 ico/cmd/deploycontracts.py --deployment-file crowdsales/YPB_CS.yml --deployment-name YPB-token --address 0x88d4c3A4299a3EdB91AA04147A2380F263E94E4F
 
 # This is the deployment-name parameter.
 YPB-token:
@@ -30,7 +30,7 @@ YPB-token:
         team_multisig:
             contract_name: MultiSigWallet
             contract_file: GnosisWallet.sol
-            address: "0xCd9d9E52a40aB92a102CB9fB05843b8D50b3B17e"
+            address: "0xb97cfdbbc527f1da7d2b890ab93d7a5e2a55151b"
          
               
         # Token contract
@@ -38,7 +38,7 @@ YPB-token:
         token:
             contract_name: BurnableCrowdsaleToken
             contract_file: BurnableCrowdsaleToken.sol
-            address: "0xca1fbd59e573d5e2044c464b942ce0ab8e1e84bf"
+            address: "0x41a9df0cfa967445bfdecb17d1194fe540bd21c0"
             #arguments:
             #    _name: "Youpinbi"
             #    _symbol: "YPB"
@@ -62,22 +62,22 @@ YPB-token:
                     
                     # This tranche starts when we have sold 4.2M USD or 5250 ether worth of tokens
                     # 20% bonus tier. Price per token 0.08 USD 
-                    - "{{ to_wei('5250.00', 'ether') }}"
+                    - "{{ to_wei('5.25000', 'ether') }}"
                     - 100000000000000
                                                         
                     # This tranche starts when we have sold 9M USD (4.2M + 4.8M) or 11250 ether worth of tokens.
                     # 15% bonus tier. Price per token 0.085 USD 
-                    - "{{ to_wei('11250.00', 'ether') }}"
+                    - "{{ to_wei('11.25000', 'ether') }}"
                     - 106250000000000
 
                     # This tranche starts when we have sold 14.1M USD (9M + 5.1M) or 17625 ether worth of tokens.
                     # 5% bonus tier. Price per token 0.95 USD
-                    - "{{ to_wei('17625.00', 'ether') }}"
+                    - "{{ to_wei('17.62500', 'ether') }}"
                     - 118750000000000
 
                     # This tranche starts when we have sold 19.8M USD (14.1M + 5.7M) or 24750 ether worth of tokens.
                     # 0% bonus tier. Price per token 0.10 USD
-                    - "{{ to_wei('24750.00', 'ether') }}"
+                    - "{{ to_wei('24.75000', 'ether') }}"
                     - 125000000000000
                     
                     # Dummy milestone marker to mark the end
@@ -118,9 +118,12 @@ YPB-token:
             confirm_tx(crowdsale.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent.address))
                                
             # Add approved addresses to Crowdsale Whitelist
-            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist(deploy_address)
-            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0xA03783510256f318AD666354C39dB15d8B2F516A')
-            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x704a645E17A9F6EA9d2Be8B9c8B5748eE4c24022')
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist(deploy_address)     
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x6641c30B8Ec57A6168707115b80B0af1a5cf160C')
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0xfa13e83fa42b93e43cda0bf0ebbaf8f373ce21f2')
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x10594B019de165B051c2dD99ED484DC9DAA20005')
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x652A9f47a8Cef97E61bCCc5cc7E6B00566F8f5ae')
+            crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0xC53980f3f373AeB70688d16E12f8f90Ab33b5A22')
 
             # Set token owner to team multisig
             confirm_tx(token.transact({"from": deploy_address}).transferOwnership(team_multisig.address))
