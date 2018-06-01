@@ -171,9 +171,8 @@ contract CrowdsaleBase is Haltable, Whitelist {
     Whitelist dc;
     address contract_addr = 0xf30218db54dafb0d6fe61fcec8912129418b3150;
     dc = Whitelist(contract_addr);
-    bool result;
-    result = dc.whitelist(msg.sender);
-    require (result == true);
+    require (dc.whitelist(msg.sender));
+    require (dc.whitelist(receiver));
     
     
     // Determine if it's a good time to accept investment from this participant
