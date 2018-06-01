@@ -164,9 +164,18 @@ contract CrowdsaleBase is Haltable, Whitelist {
   function investInternal(address receiver, uint128 customerId) stopInEmergency internal returns(uint tokensBought) {
 
     // Determine reciever address is Whitelisted or not.
-	require(whitelist[msg.sender]);
-	require(whitelist[receiver]);
-
+	//   require(whitelist[msg.sender]);
+	//   require(whitelist[receiver]);
+    
+    // Define address of a pre-deployed Whitelist Contract and call the whitelist function on the contract to verify msg.sender and receiver
+    Whitelist dc;
+    address contract_addr = 0xf30218db54dafb0d6fe61fcec8912129418b3150;
+    dc = Whitelist(contract_addr);
+    bool result;
+    result = dc.whitelist(msg.sender);
+    require (result == true);
+    
+    
     // Determine if it's a good time to accept investment from this participant
     if(getState() == State.PreFunding) {
       // Are we whitelisted for early deposit
