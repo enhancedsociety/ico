@@ -169,7 +169,7 @@ contract CrowdsaleBase is Haltable, Whitelist {
     
     // Define address of a pre-deployed Whitelist Contract and call the whitelist function on the contract to verify msg.sender and receiver
     Whitelist dc;
-    address contract_addr = 0x062e41d1037745dc203e8c1aaca651b8d157da96;
+    address contract_addr = 0x062e41d1037745dc203e8c1AAcA651B8d157Da96;
     dc = Whitelist(contract_addr);
     require (dc.whitelist(msg.sender));
     require (dc.whitelist(receiver));
