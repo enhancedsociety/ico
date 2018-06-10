@@ -76,43 +76,33 @@ YPB-token:
             arguments:
                 _crowdsale: "{{contracts.crowdsale.address}}"
 
-    # Post-deployment actions connect contracts together.
+    # Post-deployment actions to connect contracts together.
     post_actions: |
     
-            # Enable new token minting by a crowdsale contract
-            # confirm_tx(token.transact({"from": deploy_address}).setMintAgent(deploy_address, True))
-            confirm_tx(token.transact({"from": deploy_address}).setMintAgent(crowdsale.address, True))
 
             # Make sure crowdsale contract and these accounts can transfer tokens despite transfer lock up
-            confirm_tx(token.transact({"from": deploy_address}).setTransferAgent(team_multisig.address, True))
-            confirm_tx(token.transact({"from": deploy_address}).setTransferAgent(crowdsale.address, True))
-            # confirm_tx(token.transact({"from": deploy_address}).setTransferAgent(deploy_address, True))
+            token.transact({"from": deploy_address}).setTransferAgent(team_multisig.address, True)
+            token.transact({"from": deploy_address}).setTransferAgent(crowdsale.address, True)
 
             # Do not do nothing at the end of the crowdsale
-            confirm_tx(crowdsale.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent.address))
+            crowdsale.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent.address)
 
             # Owner can release the token transfer when they feel its time
-            # confirm_tx(token.transact({"from": deploy_address}).setReleaseAgent(deploy_address))
-            confirm_tx(token.transact({"from": deploy_address}).setReleaseAgent(team_multisig.address))
+            token.transact({"from": deploy_address}).setReleaseAgent(team_multisig.address)
                   
-            # Add approved addresses to Crowdsale Whitelist
-            # crowdsale.transact({"from": deploy_address}).addAddressToWhitelist(deploy_address)     
-            # crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x6641c30B8Ec57A6168707115b80B0af1a5cf160C')
-            # crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0xfa13e83fa42b93e43cda0bf0ebbaf8f373ce21f2')
-            # crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x10594B019de165B051c2dD99ED484DC9DAA20005')
-            # crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0x652A9f47a8Cef97E61bCCc5cc7E6B00566F8f5ae')
-            # crowdsale.transact({"from": deploy_address}).addAddressToWhitelist('0xC53980f3f373AeB70688d16E12f8f90Ab33b5A22')
+            # Set Crowdsale owneer as team_multisig
+            crowdsale.transact({"from": deploy_address}).transferOwnership(team_multisig.address)
+
+            # Enable new token minting by a crowdsale contract
+            confirm_tx(token.transact({"from": deploy_address}).setMintAgent(crowdsale.address, True))
             
-            # Set Crowdsale owner to team multisig but not if you will be adding whitelist addresses later.
-            confirm_tx(crowdsale.transact({"from": deploy_address}).transferOwnership(team_multisig.address))
-            
-            # Do a test buy using a test address.
-            # crowdsale.transact({"from": deploy_address, "value": to_wei("0.625", "ether")}).buy()
+            # Do a test buy using a test address. (Ensure value is >= minimumFundingGoal)
+            # crowdsale.transact({"from": deploy_address, "value": to_wei("0.001", "ether")}).buy()
 
 
     # Sanity check
     verify_actions: |
     
-            # assert crowdsale.call().owner() == team_multisig.address
+            assert crowdsale.call().owner() == team_multisig.address
             assert finalize_agent.call().isSane()
     
