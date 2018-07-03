@@ -58,7 +58,7 @@ YPB-token:
         # Crowdsale Contracts Below.
         # _minimumFundingGoal is leveraged to also be the minimum contribution amount
 
-        # Internal Test Sale. 1 Jul to 31 Aug 2018
+        # Internal Test Sale. 2 Jul to 31 Aug 2018
         
         crowdsale1:
             contract_name: MintedTokenCappedCrowdsale
@@ -67,12 +67,12 @@ YPB-token:
                 _token: "{{contracts.token.address}}"
                 _pricingStrategy: "{{contracts.pricing_strategy.address}}"
                 _multisigWallet: "{{contracts.team_multisig.address}}"
-                _start: "{{ timestamp(datetime(2018, 7, 1, 00, 00)) }}"
+                _start: "{{ timestamp(datetime(2018, 7, 02, 00, 00)) }}"
                 _end: "{{ timestamp(datetime(2018, 8, 31, 23, 59)) }}"
                 _minimumFundingGoal: 1
                 _maximumSellableTokens: "{{ to_wei(5000, 'ether') }}"
 
-        # Private Sale. 1 Jul to 31 Aug 2018
+        # Private Sale. 2 Jul to 31 Aug 2018
 
         crowdsale2:
             contract_name: MintedTokenCappedCrowdsale
@@ -81,25 +81,31 @@ YPB-token:
                 _token: "{{contracts.token.address}}"
                 _pricingStrategy: "{{contracts.pricing_strategy.address}}"
                 _multisigWallet: "{{contracts.team_multisig.address}}"
-                _start: "{{ timestamp(datetime(2018, 7, 1, 00, 00)) }}"
+                _start: "{{ timestamp(datetime(2018, 7, 02, 00, 00)) }}"
                 _end: "{{ timestamp(datetime(2018, 8, 31, 23, 59)) }}"
                 _minimumFundingGoal: "{{ to_wei(83.33, 'ether') }}"
                 _maximumSellableTokens: "{{ to_wei(60000000, 'ether') }}"
 
                     
-        finalize_agent:
+        finalize_agent1:
             contract_name: NullFinalizeAgent
             contract_file: NullFinalizeAgent.sol
             arguments:
-                _crowdsale: "{{contracts.crowdsale.address}}"
+                _crowdsale: "{{contracts.crowdsale1.address}}"
+
+        finalize_agent2:
+            contract_name: NullFinalizeAgent
+            contract_file: NullFinalizeAgent.sol
+            arguments:
+                _crowdsale: "{{contracts.crowdsale2.address}}"
 
     # Post-deployment actions connect contracts together.
     post_actions: |
     
 
             # Do nothing at the end of the crowdsale, i.e. releasing tokens & bonus distribution will be handled manually later.
-            crowdsale1.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent.address)
-            crowdsale2.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent.address)
+            crowdsale1.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent1.address)
+            crowdsale2.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent2.address)
 
             # Set Crowdsale owneer as team_multisig
             crowdsale1.transact({"from": deploy_address}).transferOwnership(team_multisig.address)
@@ -108,20 +114,22 @@ YPB-token:
             # Below transactions need to be done manually via gnosis.
 
             # 1. Make sure crowdsale contract and these accounts can transfer tokens despite transfer lock up
-            #token.transact({"from": deploy_address}).setTransferAgent(crowdsale1.address, True)
-            #token.transact({"from": deploy_address}).setTransferAgent(crowdsale2.address, True)
+            token.transact({"from": deploy_address}).setTransferAgent(crowdsale1.address, True)
+            token.transact({"from": deploy_address}).setTransferAgent(crowdsale2.address, True)
 
             # 2. Enable new token minting by a crowdsale contract (If deploy address does not own Token then do this step manually using remix/etherwallet)
-            #token.transact({"from": deploy_address}).setMintAgent(crowdsale1.address, True)
-            #token.transact({"from": deploy_address}).setMintAgent(crowdsale2.address, True)
+            token.transact({"from": deploy_address}).setMintAgent(crowdsale1.address, True)
+            token.transact({"from": deploy_address}).setMintAgent(crowdsale2.address, True)
 
             # 3. Do a test buy using a test address.
-            #crowdsale.transact({"from": deploy_address, "value": to_wei("0.00001", "ether")}).buy()
+            crowdsale1.transact({"from": deploy_address, "value": to_wei("0.01", "ether")}).buy()
+            crowdsale2.transact({"from": deploy_address, "value": to_wei("83.33", "ether")}).buy()
 
 
     # Sanity check
     verify_actions: |
     
-            assert crowdsale.call().owner() == team_multisig.address
-            assert finalize_agent.call().isSane()
-    
+            assert crowdsale1.call().owner() == team_multisig.address
+            assert crowdsale2.call().owner() == team_multisig.address
+            assert finalize_agent1.call().isSane()
+            assert finalize_agent2.call().isSane()
