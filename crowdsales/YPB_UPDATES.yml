@@ -1,4 +1,4 @@
-# python3 ico/cmd/deploycontracts.py --deployment-file crowdsales/YPB_INTERNAL.yml --deployment-name YPB-token --address 0x3a514b826d8235dfbfc7e67f9d7f6173e9c109ed
+# python3 ico/cmd/deploycontracts.py --deployment-file crowdsales/YPB_UPDATES.yml --deployment-name YPB-token --address 0x3A514B826d8235DfBFc7e67F9D7F6173E9C109Ed
 
 # This is the deployment-name parameter.
 YPB-token:
@@ -32,7 +32,7 @@ YPB-token:
             contract_file: GnosisWallet.sol
             address: "0x46cf3064b571bfb48367182764c5e5d2e02e3733"
           
-        # Token contract
+        # Token contract ,using existing YPB Token address
         
         token:
             contract_name: BurnableCrowdsaleToken
@@ -111,7 +111,7 @@ YPB-token:
             crowdsale1.transact({"from": deploy_address}).transferOwnership(team_multisig.address)
             crowdsale2.transact({"from": deploy_address}).transferOwnership(team_multisig.address)
 
-            # Below transactions need to be done manually via gnosis.
+            # Below transactions need to be done after token ownership is transferred to the deploy wallet via gnosis.
 
             # 1. Make sure crowdsale contract and these accounts can transfer tokens despite transfer lock up
             token.transact({"from": deploy_address}).setTransferAgent(crowdsale1.address, True)

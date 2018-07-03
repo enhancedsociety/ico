@@ -1,0 +1,183 @@
+# python3 ico/cmd/deploycontracts.py --deployment-file crowdsales/CRCM_TSE.yml --deployment-name CRCM-token --address 0x3A514B826d8235DfBFc7e67F9D7F6173E9C109Ed
+
+# This is the deployment-name parameter.
+CRCM-token:
+
+    # This is the chain name in populus.json
+    chain: mainnet
+
+    # Use automated Chrome to verify all contracts on etherscan.io
+    verify_on_etherscan: no
+    browser_driver: chrome
+
+    solc:
+
+        # This is the Solidity version tag we verify on EtherScan.
+        version: v0.4.14+commit.c2215d46
+
+        
+        # We supply these to EtherScan as the solc settings we used to compile the contract.
+        # They must match values in populus.json compilication / backends section.
+        
+        optimizations:
+            optimizer: true
+            runs: 500
+
+    contracts:
+        
+        # These are the addresses of the multisig wallets . Ensure below is set to ES team's mainnet wallet 0x46cf3064b571bfb48367182764c5e5d2e02e3733 before deploying to mainnet
+        
+        team_multisig:
+            contract_name: MultiSigWallet
+            contract_file: GnosisWallet.sol
+            address: "0x46cf3064b571bfb48367182764c5e5d2e02e3733"
+          
+        # Token contract
+        
+        token:
+            contract_name: BurnableCrowdsaleToken
+            contract_file: BurnableCrowdsaleToken.sol
+            arguments:
+                _name: "Circum"
+                _symbol: "CRCM"
+                _initialSupply: 0
+                _decimals: 18
+                _mintable: true
+       
+        
+        # Pricing Strategy in Wei, which is the smallest unit of ether. 1 ETH = 10^18 Wei
+        # ETH priced at 600 USD, 85% bonus tier. Price per token 0.0015 USD 
+        
+        pricing_strategy1:
+            contract_name: FlatPricing
+            contract_file: FlatPricing.sol
+            arguments:
+                _oneTokenInWei:  2500000000000
+                        
+        # Private Sale @ USD 0.0015 , 200000000 Tokens Minimum Buyin 83.33 ETH
+                
+        crowdsale1:
+            contract_name: MintedTokenCappedCrowdsale
+            contract_file: MintedTokenCappedCrowdsale.sol
+            arguments:
+                _token: "{{contracts.token.address}}"
+                _pricingStrategy: "{{contracts.pricing_strategy1.address}}"
+                _multisigWallet: "{{contracts.team_multisig.address}}"
+                _start: "{{ timestamp(datetime(2018, 7, 02, 00, 00)) }}"
+                _end: "{{ timestamp(datetime(2018, 8, 31, 23, 59)) }}"
+                _minimumFundingGoal: "{{ to_wei(83.33, 'ether') }}"
+                _maximumSellableTokens: "{{ to_wei(200000000, 'ether') }}"
+        
+        # ETH priced at 600 USD, 50% bonus tier. Price per token 0.005 USD 
+        
+        pricing_strategy2:
+            contract_name: FlatPricing
+            contract_file: FlatPricing.sol
+            arguments:
+                _oneTokenInWei:  8333333333333 
+        
+        
+        # Private Sale @ USD 0.005 , 275000000 Tokens Tokens Minimum Buyin 83.33 ETH
+        
+        crowdsale2:
+            contract_name: MintedTokenCappedCrowdsale
+            contract_file: MintedTokenCappedCrowdsale.sol
+            arguments:
+                _token: "{{contracts.token.address}}"
+                _pricingStrategy: "{{contracts.pricing_strategy2.address}}"
+                _multisigWallet: "{{contracts.team_multisig.address}}"
+                _start: "{{ timestamp(datetime(2018, 7, 02, 00, 00)) }}"
+                _end: "{{ timestamp(datetime(2018, 8, 31, 23, 59)) }}"
+                _minimumFundingGoal: "{{ to_wei(83.33, 'ether') }}"
+                _maximumSellableTokens: "{{ to_wei(275000000, 'ether') }}"
+        
+        # ETH priced at 600 USD, 50% bonus tier. Price per token 0.005 USD 
+        
+        pricing_strategy3:
+            contract_name: FlatPricing
+            contract_file: FlatPricing.sol
+            arguments:
+                _oneTokenInWei:  8333333333333 
+        
+        
+        # Internal Test Sale @ USD 0.005 , 50000 Tokens Tokens No Minimum Buyin Test
+        
+        crowdsale3:
+            contract_name: MintedTokenCappedCrowdsale
+            contract_file: MintedTokenCappedCrowdsale.sol
+            arguments:
+                _token: "{{contracts.token.address}}"
+                _pricingStrategy: "{{contracts.pricing_strategy3.address}}"
+                _multisigWallet: "{{contracts.team_multisig.address}}"
+                _start: "{{ timestamp(datetime(2018, 7, 02, 00, 00)) }}"
+                _end: "{{ timestamp(datetime(2018, 8, 31, 23, 59)) }}"
+                _minimumFundingGoal: 1
+                _maximumSellableTokens: "{{ to_wei(50000, 'ether') }}"
+                
+        # Dont do anything after crowdsale ends. Bonus distribution and token release will be handled 
+        
+        finalize_agent1:
+            contract_name: NullFinalizeAgent
+            contract_file: NullFinalizeAgent.sol
+            arguments:
+                _crowdsale: "{{contracts.crowdsale1.address}}"
+         
+        finalize_agent2:
+            contract_name: NullFinalizeAgent
+            contract_file: NullFinalizeAgent.sol
+            arguments:
+                _crowdsale: "{{contracts.crowdsale2.address}}"
+                
+        finalize_agent3:
+            contract_name: NullFinalizeAgent
+            contract_file: NullFinalizeAgent.sol
+            arguments:
+                _crowdsale: "{{contracts.crowdsale3.address}}"         
+
+    # Post-deployment actions to connect contracts together.
+    post_actions: |
+    
+            # Make sure crowdsale contract and these accounts can transfer tokens despite transfer lock up
+            token.transact({"from": deploy_address}).setTransferAgent(team_multisig.address, True)
+            token.transact({"from": deploy_address}).setTransferAgent(crowdsale1.address, True)
+            token.transact({"from": deploy_address}).setTransferAgent(crowdsale2.address, True)
+            token.transact({"from": deploy_address}).setTransferAgent(crowdsale3.address, True)
+
+            # Owner can release the token transfer when they feel its time
+            token.transact({"from": deploy_address}).setReleaseAgent(team_multisig.address)
+
+            # Do not do nothing at the end of the crowdsale
+            crowdsale1.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent1.address)
+            crowdsale2.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent2.address)
+            crowdsale3.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent3.address)
+            
+            # Enable new token minting by a crowdsale contract
+            confirm_tx(token.transact({"from": deploy_address}).setMintAgent(crowdsale1.address, True))
+            confirm_tx(token.transact({"from": deploy_address}).setMintAgent(crowdsale2.address, True))
+            confirm_tx(token.transact({"from": deploy_address}).setMintAgent(crowdsale3.address, True))
+                  
+            # Do a test buy using a test address. (Ensure value is >= minimumFundingGoal)
+            crowdsale1.transact({"from": deploy_address, "value": to_wei("83.33", "ether")}).buy()
+            crowdsale2.transact({"from": deploy_address, "value": to_wei("83.33", "ether")}).buy()
+            crowdsale3.transact({"from": deploy_address, "value": to_wei("0.01", "ether")}).buy()
+
+            # Set Crowdsale owner as team_multisig
+            crowdsale1.transact({"from": deploy_address}).transferOwnership(team_multisig.address)
+            crowdsale2.transact({"from": deploy_address}).transferOwnership(team_multisig.address)
+            crowdsale3.transact({"from": deploy_address}).transferOwnership(team_multisig.address)
+                      
+            # Set token owner to team multisig
+            token.transact({"from": deploy_address}).transferOwnership(team_multisig.address)
+            token.transact({"from": deploy_address}).setUpgradeMaster(team_multisig.address)
+
+    # Sanity check
+    verify_actions: |
+    
+            assert crowdsale1.call().owner() == team_multisig.address
+            assert crowdsale2.call().owner() == team_multisig.address
+            assert crowdsale3.call().owner() == team_multisig.address
+            assert token.call().owner() == team_multisig.address
+            assert finalize_agent1.call().isSane()
+            assert finalize_agent2.call().isSane()
+            assert finalize_agent3.call().isSane()
+    
