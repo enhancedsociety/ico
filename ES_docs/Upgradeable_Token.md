@@ -1,7 +1,11 @@
+## Introduction
+
 Every so often there are issues in code that requires fixing and while fixing code in traditional environments is straight forward , how does one fix code on an immutable non reversible ledger such as the blockchain ? 
 
 In this session we look at how a token contract can be upgraded on ethereum, also while exploring this feature we will look into some of the other features of advance token contracts such as transfer locking and releasing.
 
+
+## Pre-Requisites.
 
 1. Clone the following repo to obtain necessary sample contracts.
 
@@ -16,6 +20,8 @@ git clone https://github.com/dpnova/goldcoast-blockchain-meetup.git
 NOTE : The contract's have been obtained from https://github.com/TokenMarketNet/ico and flattened for ease of use using https://github.com/BlockCatIO/solidity-flattener . Contract UpgradedToken_flat.sol is a copy of TestMigrationAgent.sol with modifications to the contract name.
 
 ![](images/UT/3.png)
+
+# Deploy Initial token
 
 4. Click on the Contract BurnableCrowdsaleToken_flat.sol
 
@@ -58,6 +64,8 @@ NOTE :  When tokens are initially created often token issuers might choose to lo
 
 13. Next we will publish the contract to which we want to upgrade the existing tokens to.
 
+## Deploy Token to be upgraded to.
+
 14. Click on UpgradedToken_flat.sol and click on the compile tabe and click Start to Compile.
 
 ![](images/UT/14.png)
@@ -73,6 +81,8 @@ NOTE :  When tokens are initially created often token issuers might choose to lo
 18. Expand the newly published UpgradedToken contract and click on OriginalSupply. This should match the TotalSupply of the previously published Token Contract.
 
 ![](images/UT/18.png)
+
+## Upgrading the token.
 
 19. Copy the Address of the UpgradedToken contract and paste it in setUpgradeAgent function field for the BurnableCrowdsaleToken and click on setUpgradeAgent.
 
