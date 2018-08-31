@@ -21,7 +21,7 @@ NOTE : The contract's have been obtained from https://github.com/TokenMarketNet/
 
 ![](images/UT/3.png)
 
-# Deploy Initial token
+## Deploy Initial token
 
 4. Click on the Contract BurnableCrowdsaleToken_flat.sol
 
