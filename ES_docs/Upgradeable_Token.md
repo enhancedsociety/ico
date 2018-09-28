@@ -103,7 +103,7 @@ NOTE : In case your contract functions cease to respond , this is a remix GUI bu
 
 ![](images/UT/22.png)
 
-23. Click totalSupply for UpgradeToken and it will show 50000000000000000000 tokens in supply. The old tokens have been destroyed and an equvivalent number of new tokens have been issued.
+23. Click totalSupply for UpgradedToken and it will show 50000000000000000000 tokens in supply. The old tokens have been destroyed and an equvivalent number of new tokens have been issued.
 
 ![](images/UT/23.png)
 
