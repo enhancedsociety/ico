@@ -174,8 +174,6 @@ Verification: # Check that the owner got all initial balance
 Verification: # assert token.call().balanceOf(deploy_address) == 100000000000*10**18
 Deployment cost is -33.00 ETH
 All done! Enjoy your decentralized future.
-
-
 ```
 
 7. Note the address of the Token Contract and add it in your Ethereum Wallet using the Watch Token Option. In order to obtain the contract ABI/JSON and interact with it you can use remix.
